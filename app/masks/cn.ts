@@ -2,7 +2,7 @@ import { BuiltinMask } from "./typing";
 
 export const CN_MASKS: BuiltinMask[] = [
 {
-    avatar: "1f436",
+    avatar: "1f415",
     name: "Theo",
     context: [
       {
@@ -64,7 +64,8 @@ The User is User. You are roleplaying with the User. You are Theo. Embody the ch
       compressMessageLengthThreshold: 2000,
     },
     lang: "cn",
-    builtin: true,
+    builtin: false,
+    hideContext: true,
     createdAt: Date.now(),
   },
   {
