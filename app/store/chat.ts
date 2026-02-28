@@ -36,6 +36,7 @@ import { ModelConfig, ModelType, useAppConfig } from "./config";
 import { useAccessStore } from "./access";
 import { collectModelsWithDefaultModel } from "../utils/model";
 import { createEmptyMask, Mask } from "./mask";
+import { CN_MASKS } from "../masks/cn";
 import { executeMcpAction, getAllTools, isMcpEnabled } from "../mcp/actions";
 import { extractMcpJson, isMcpJson } from "../mcp/utils";
 
@@ -102,11 +103,26 @@ export const BOT_HELLO: ChatMessage = createMessage({
 });
 
 function createEmptySession(): ChatSession {
+  // 1. 获取面具库里的第一个面具（Theo）
+  const theoMask = CN_MASKS[0];
+  const createDate = new Date().toLocaleString();
+
   return {
     id: nanoid(),
-    topic: DEFAULT_TOPIC,
+    // 2. 将标题直接设置为 Theo 的名字
+    topic: theoMask.name, 
     memoryPrompt: "",
-    messages: [],
+    
+    // 3. 核心：将 Theo 的预设对话（System/User/Assistant）直接加载为聊天记录
+    // 这样一进聊天框，不仅有逻辑，还有开场白
+    messages: theoMask.context.map((c) => ({
+      ...c,
+      id: nanoid(),
+      date: createDate,
+      role: c.role as any, // 强制转换类型，避免报错
+      content: c.content,
+    })),
+
     stat: {
       tokenCount: 0,
       wordCount: 0,
@@ -115,7 +131,8 @@ function createEmptySession(): ChatSession {
     lastUpdate: Date.now(),
     lastSummarizeIndex: 0,
 
-    mask: createEmptyMask(),
+    // 4. 绑定面具配置（确保使用的是 Gemini 模型）
+    mask: theoMask, 
   };
 }
 
